@@ -1,11 +1,11 @@
 (() => {
 	// ===== 快捷命令 =====
 	const commandHelp = `
-	KubeJS macro command - #runle
-	Module: Runle
-	#runle stop - [OP] Stop server immediately
-	#runle timer - [OP] Stop server after a 20-second countdown
-	#runle cancel <id> - [OP] Cancel countdown in progress
+KubeJS macro command - #runle
+Module: Runle
+#runle stop - [OP] Stop server immediately
+#runle timer - [OP] Stop server after a 20-second countdown
+#runle cancel <id> - [OP] Cancel countdown in progress
 	`.trim()
 	onEvent('player.chat', event => {
 		const { player, server, message } = event

@@ -68,11 +68,11 @@
 
 	// ===== 快捷命令 =====
 	const commandHelp = `
-	KubeJS macro command - #adv
-	Module: Advancement Sync
-	#adv count - Show count of gained advancements
-	#adv revoke * - [OP] Revoke all advancements for everyone
-	#adv revoke <id> - [OP] Revoke an advancement for everyone
+KubeJS macro command - #adv
+Module: Advancement Sync
+#adv count - Show count of gained advancements
+#adv revoke * - [OP] Revoke all advancements for everyone
+#adv revoke <id> - [OP] Revoke an advancement for everyone
 	`.trim()
 	onEvent('player.chat', event => {
 		const { player, server, message } = event

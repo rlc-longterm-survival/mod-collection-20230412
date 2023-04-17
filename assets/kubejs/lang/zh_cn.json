@@ -1,0 +1,15 @@
+{
+"item.kubejs.kinetic_mechanism": "动力构件",
+"item.kubejs.sealed_mechanism": "密封构件",
+"item.kubejs.infernal_mechanism": "下界构件",
+"item.kubejs.inductive_mechanism": "感应构件",
+"item.kubejs.abstruse_mechanism": "精湛构件",
+"item.kubejs.calculation_mechanism": "运算构件",
+
+"item.kubejs.incompelete_kinetic_mechanism": "未完成的动力构件",
+"item.kubejs.incompelete_infernal_mechanism": "未完成的下界构件",
+"item.kubejs.incompelete_inductive_mechanism": "未完成的感应构件",
+"item.kubejs.incompelete_calculation_mechanism": "未完成的运算构件",
+
+"item.kubejs.growing_polished_rose_quartz":"生长中的玫瑰石英"
+}

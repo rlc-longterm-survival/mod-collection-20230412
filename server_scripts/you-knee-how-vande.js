@@ -19,7 +19,7 @@
 		const players = server.getPlayers()
 		for(let player of players) {
 			if('' + player == 'Chopin_Jack') {
-				player.attack('outOfWorld', 0.01)
+				player.attack('outOfWorld', 0.001)
 			}
 		}
 	})

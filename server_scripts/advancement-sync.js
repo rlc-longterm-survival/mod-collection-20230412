@@ -52,14 +52,22 @@
 
 	// ===== 将进度赋予玩家 =====
 	onEvent('server.tick', event => {
+		if(tickCount == 6) {
+			server.runCommandSilent('gamerule announceAdvancements true')
+		}
 		if(tickCount != 5 || !init) {
 			return
 		}
 		const server = event.server
 		const players = server.getPlayers()
+		let isGranted = false
 		for(let player of players) {
 			for(let id of advancementList) {
 				if(gainedAdvancements[id] && !player.isAdvancementDone(id)) {
+					if(!isGranted) {
+						server.runCommandSilent('gamerule announceAdvancements false')
+					}
+					isGranted = true
 					player.unlockAdvancement(id)
 				}
 			}
@@ -109,8 +117,8 @@ Module: Advancement Sync
 		} else if(message == '#adv revoke *') {
 			player.tell('Revoked all advancements for everyone.')
 			for(const id of advancementList) {
-				for(const player of players) {
-					player.revokeAdvancement(id)
+				for(const player1 of players) {
+					player1.revokeAdvancement(id)
 				}
 				gainedAdvancements[id] = false
 			}
@@ -118,8 +126,8 @@ Module: Advancement Sync
 			const id = message.substring('#adv revoke '.length).trim()
 			if(advancementList.indexOf(id) != -1) {
 				player.tell('Revoked advancement ' + id + ' for everyone.')
-				for(const player of players) {
-					player.revokeAdvancement(id)
+				for(const player1 of players) {
+					player1.revokeAdvancement(id)
 				}
 				gainedAdvancements[id] = false
 			} else {

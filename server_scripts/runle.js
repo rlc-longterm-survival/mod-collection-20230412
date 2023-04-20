@@ -1,42 +1,42 @@
 (() => {
 	// ===== 快捷命令 =====
-	const commandHelp = `
-KubeJS macro command - #runle
-Module: Runle
-#runle stop - [OP] Stop server immediately
-#runle timer - [OP] Stop server after a 20-second countdown
-#runle cancel <id> - [OP] Cancel countdown in progress
-	`.trim()
-	onEvent('player.chat', event => {
-		const { player, server, message } = event
-
-		if(commandStarts(message, '#runle')) {
-			event.cancel()
-		} else {
-			return
-		}
-		if(!player.isOp()) {
-			player.tell('Permission denied')
-			return
-		}
-
-		message = message.trim()
-		if(message == '#runle') {
-			player.tell(commandHelp)
-		}
-		
-		if(commandStarts(message, '#runle stop')) {
-			for(const player of server.getPlayers()) {
-				server.runCommandSilent('kick ' + player + ' [Server] runle')
-			}
-			server.runCommandSilent('stop')
-		} else if(commandStarts(message, '#runle timer')) {
-			countDown = 20 * 20 + 20
-			server.runCommandSilent('say Get ready to run!')
-		} else if(commandStarts(message, '#runle cancel')) {
-			server.runCommandSilent('say Runle countdown canceled.')
-			countDown = undefined
-		}
+	onEvent("command.registry", event => {
+		const { commands: Commands, arguments: Arguments } = event
+		event.register(
+			Commands
+			.literal('runle')
+			.requires(src => src.hasPermission(4))
+			.then(Commands.literal('stop')
+				.executes(ctx => {
+					const server = ctx.source.server.asKJS()
+					for(const player of server.getPlayers()) {
+						server.runCommandSilent('kick ' + player + ' [Server] runle')
+					}
+					server.runCommandSilent('stop')
+					return 1
+				})
+			)
+			.then(Commands.literal('timer')
+				.then(
+					Commands.argument('seconds', Arguments.INTEGER.create(event).integer(0, 3600))
+					.executes(ctx => {
+						const seconds = Arguments.INTEGER.getResult(ctx, 'seconds')
+						const server = ctx.source.server.asKJS()
+						countDown = seconds * 20 + 20
+						server.runCommandSilent('say Get ready to run!')
+						return 1
+					})
+				)
+			)
+			.then(Commands.literal('cancel')
+				.executes(ctx => {
+					const server = ctx.source.server.asKJS()
+					countDown = undefined
+					server.runCommandSilent('say Runle countdown canceled.')
+					return 1
+				})
+			)
+		)
 	})
 
 	// ===== 倒计时 =====

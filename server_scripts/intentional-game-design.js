@@ -6,7 +6,7 @@
 
 		if(name && name.getText() == '丑') {
 			if(!player.creativeMode) {
-				player.attack('outOfWorld', 40)
+				player.attack('outOfWorld', 1000)
 				event.server.tell('哦！那看起来血压很高')
 			}
 			let blockId = '' + event.getLevel().getBlock(Math.floor(item.x), item.y, Math.floor(item.z)).getId()

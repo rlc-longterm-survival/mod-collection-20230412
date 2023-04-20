@@ -53,7 +53,7 @@
 	// ===== 将进度赋予玩家 =====
 	onEvent('server.tick', event => {
 		if(tickCount == 6) {
-			server.runCommandSilent('gamerule announceAdvancements true')
+			event.server.runCommandSilent('gamerule announceAdvancements true')
 		}
 		if(tickCount != 5 || !init) {
 			return
@@ -74,65 +74,76 @@
 		}
 	})
 
-	// ===== 快捷命令 =====
-	const commandHelp = `
-KubeJS macro command - #adv
-Module: Advancement Sync
-#adv count - Show count of gained advancements
-#adv revoke * - [OP] Revoke all advancements for everyone
-#adv revoke <id> - [OP] Revoke an advancement for everyone
-	`.trim()
-	onEvent('player.chat', event => {
-		const { player, server, message } = event
-		const players = server.getPlayers()
-
-		if(message == '#adv' || message.startsWith('#adv ')) {
-			event.cancel()
-		} else {
-			return
-		}
-		if(!init) {
-			return
-		}
-
-		message = message.trim()
-		
-		if(message == '#adv revoke' || message.startsWith('#adv revoke ')) {
-			if(!player.isOp()) {
-				player.tell('Permission denied.')
-				return
-			}
-		}
-
-		if(message == '#adv') {
-			player.tell(commandHelp)
-		}
-		if(message == '#adv count') {
-			let gainedCnt = 0
-			for(let id in gainedAdvancements) {
-				gainedCnt += 1
-			}
-			player.tell('Gained ' + gainedCnt + '/' + advancementList.length + ' advancements')
-			return
-		} else if(message == '#adv revoke *') {
-			player.tell('Revoked all advancements for everyone.')
-			for(const id of advancementList) {
-				for(const player1 of players) {
-					player1.revokeAdvancement(id)
-				}
-				gainedAdvancements[id] = false
-			}
-		} else if(message.startsWith('#adv revoke ')) {
-			const id = message.substring('#adv revoke '.length).trim()
-			if(advancementList.indexOf(id) != -1) {
-				player.tell('Revoked advancement ' + id + ' for everyone.')
-				for(const player1 of players) {
-					player1.revokeAdvancement(id)
-				}
-				gainedAdvancements[id] = false
-			} else {
-				player.tell('Failed to revoke - no such advancement.')
-			}
-		}
+	onEvent("command.registry", event => {
+		const { commands: Commands, arguments: Arguments } = event
+		event.register(
+			Commands
+			.literal('advancement-sync')
+			.then(
+				Commands.literal('count')
+				.executes(ctx => {
+					if(!init) {
+						return 0
+					}
+					const player = ctx.source.entity.asKJS().getPlayer()
+					let gainedCnt = 0
+					for(let id in gainedAdvancements) {
+						gainedCnt += 1
+					}
+					if(player) {
+						player.tell('Gained ' + gainedCnt + '/' + advancementList.length + ' advancements')
+					}
+					return 1
+				})
+			)
+			.then(
+				Commands.literal('revoke')
+				.requires(src => src.hasPermission(2))
+				.then(
+					Commands.literal('everything')
+					.executes(ctx => {
+						if(!init) {
+							return 0
+						}
+						const player = ctx.source.entity.asKJS().getPlayer()
+						const server = ctx.source.server.asKJS()
+						const players = server.getPlayers()
+						player.tell('Revoked all advancements for everyone.')
+						for(const id of advancementList) {
+							for(const player1 of players) {
+								player1.revokeAdvancement(id)
+							}
+							gainedAdvancements[id] = false
+						}
+						return 1
+					})
+				)
+				.then(
+					Commands.literal('only')
+					.then(
+						Commands.argument('advancement', Arguments.GREEDY_STRING.create())
+						.executes(ctx => {
+							if(!init) {
+								return 0
+							}
+							const player = ctx.source.entity.asKJS().getPlayer()
+							const server = ctx.source.server.asKJS()
+							const players = server.getPlayers()
+							const id = Arguments.GREEDY_STRING.getResult(ctx, 'advancement')
+							if(advancementList.indexOf(id) != -1) {
+								player.tell('Revoked advancement ' + id + ' for everyone.')
+								for(const player1 of players) {
+									player1.revokeAdvancement(id)
+								}
+								gainedAdvancements[id] = false
+							} else {
+								player.tell('Failed to revoke - no such advancement.')
+							}
+							return 1
+						})
+					)
+				)
+			)
+		)
 	})
 })()
